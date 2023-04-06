@@ -124,9 +124,9 @@ class FarmingEnv(gym.Env):
         self.gamma = self.config['gamma']
 
         self.real_obs_space = spaces.Dict({
-            'timesteps_remaining': Box(low=0, high=np.inf),
-            'world_time': Box(low=0, high=24000),
-            'light_level': Box(low=0, high=15),
+            'timesteps_remaining': Box(low=0, high=1),
+            'world_time': Box(low=0, high=1),
+            'light_level': Box(low=0, high=1),
             'fuel': Box(low=0, high=self.config['fuel']),
             'wheat': Box(low=0, high=np.inf),
             # 'position': Box(low=-np.inf, high=np.inf, shape=(3,)),
