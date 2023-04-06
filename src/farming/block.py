@@ -1,8 +1,13 @@
-from enum import Enum, auto
+from enum import Enum
 from functools import cache
 import numpy as np
 
 class BlockType(Enum):
+    '''Enum of the different block types we care about for this task
+    
+    They are mapped to the hex color which represents them in world image
+    files
+    '''
     AIR = ""
     WHEAT = "#FFC90E"
     WATER = "#00A2E8"
@@ -14,7 +19,8 @@ class BlockType(Enum):
     FENCE = "#663310"
 
     @cache
-    def from_color(color: str):
+    @staticmethod
+    def from_color(color: str) -> "BlockType":
         for bt in BlockType.__members__.values():
             if color.upper() == bt.value.upper():
                 return bt
@@ -25,12 +31,15 @@ class BlockType(Enum):
         return self.value
 
 class Block:
-    "Represents a block of something"
+    "Represents a block"
+
+    solid_types = [BlockType.DIRT, BlockType.GRASS, BlockType.FARMLAND,
+                   BlockType.CHEST, BlockType.COMPOSTER, BlockType.FENCE]
     def __init__(self, type: BlockType):
         self.type = type
     
     def is_solid(self) -> bool:
-        return self.type in [BlockType.DIRT, BlockType.GRASS, BlockType.FARMLAND, BlockType.CHEST, BlockType.COMPOSTER, BlockType.FENCE]
+        return self.type in self.solid_types
     
     def tick(self):
         pass

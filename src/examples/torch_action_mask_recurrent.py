@@ -18,7 +18,7 @@ from ray.rllib.utils.torch_utils import FLOAT_MIN
 TensorType = torch.Tensor
 
 class TorchLSTMActionMaskModel(TorchModelV2, nn.Module):
-    """PyTorch version of above ActionMaskingModel."""
+    """Parametric action space model that uses LSTMWrapper"""
 
     def __init__(
         self,
@@ -93,7 +93,7 @@ class TorchLSTMActionMaskModel(TorchModelV2, nn.Module):
 
 
 class TorchAttnActionMaskModel(TorchModelV2, nn.Module):
-    """PyTorch version of above ActionMaskingModel."""
+    """Parametric action space model that uses AttentionWrapper"""
 
     def __init__(
         self,
