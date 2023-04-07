@@ -217,7 +217,7 @@ local function getObs(self)
         mask[action] = 1
     end
 
-    if not (block and not block.solid) then
+    if block and block.solid then
         mask['move-forward'] = 0
     end
 
