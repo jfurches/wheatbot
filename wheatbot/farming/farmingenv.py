@@ -702,7 +702,7 @@ class FuelSprite(pygame.sprite.Sprite):
         self.__update_surf()
 
     def update(self, obs: ObsType, env: FarmingEnv):
-        self.fuel = obs['fuel']
+        self.fuel = env._fuel / env.config['fuel']
         self.rect.update(self.pos, (self.dims[0] * self.fuel, self.dims[1]))
 
         self.__update_surf()
