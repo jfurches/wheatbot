@@ -105,7 +105,8 @@ class FarmingEnv(gym.Env):
     '''
 
     metadata = {
-        'render_modes': ['human', 'rgb_array']
+        'render_modes': ['human', 'rgb_array'],
+        'render_fps': 2
     }
 
     actions = ['no-op', 'move-forward', 'turn-left', 
@@ -119,7 +120,7 @@ class FarmingEnv(gym.Env):
     def __init__(self, env_config: Optional[Mapping[str, Any]], *,
                  render_mode: Optional[str] = None):
         '''Create the environment from the given configuration'''
-        self.config = DEFAULT_CONFIG | env_config
+        self.config = DEFAULT_CONFIG | (env_config or {})
 
         self.gamma = self.config['gamma']
 
@@ -213,6 +214,8 @@ class FarmingEnv(gym.Env):
 
         obs, info = self._get_obs()
         self._last_obs = obs
+
+        self._render_frame()
 
         return obs, info
 
@@ -322,6 +325,8 @@ class FarmingEnv(gym.Env):
 
         # done = self._fuel == 0 or self._timesteps == 0
         truncated = False
+
+        self._render_frame()
 
         return obs, reward, done, truncated, info
     
@@ -487,6 +492,9 @@ class FarmingEnv(gym.Env):
             }
 
     def _render_frame(self):
+        if self.render_mode is None:
+            return
+
         self._render_check()
 
         canvas = pygame.Surface(self.window_size)
@@ -665,7 +673,7 @@ class TurtleSprite(pygame.sprite.Sprite):
         self.__update_rect() 
     
     def update(self, obs: ObsType, env: FarmingEnv):
-        self.pos = obs['position']
+        self.pos = env._pos
         self.__update_rect()        
 
     def __update_rect(self):
@@ -694,7 +702,7 @@ class FuelSprite(pygame.sprite.Sprite):
         self.__update_surf()
 
     def update(self, obs: ObsType, env: FarmingEnv):
-        self.fuel = obs['fuel'][0] / env.config['fuel']
+        self.fuel = obs['fuel']
         self.rect.update(self.pos, (self.dims[0] * self.fuel, self.dims[1]))
 
         self.__update_surf()
