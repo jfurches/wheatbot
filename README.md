@@ -30,16 +30,12 @@ For more information on the environment design, see [FarmingEnv.md](farmingenv.m
 
 ## Setup
 
-An `env.yml` file is provided to generate a conda environment,
-
-```python
-conda env create -n wheatbot -f env.yml
-```
+The package can be installed using `pip install .`. Note that in order to train the agents, you will need a deep learning framework (I prefer torch), so you'll need to separately install that depending on if you want CUDA or not.
 
 ## Training
 
-I used RLlib to train PPO agents on the custom environment. An example of training on the regular environment ("flat") is in `src/examples/farming_ppo.py`. A training script for the hierarchical environment is given in
-`src/examples/hierarchical_farming_ppo.py`.
+I used RLlib to train PPO agents on the custom environment. An example of training on the regular environment ("flat") is in `examples/farming_ppo.py`. A training script for the hierarchical environment is given in
+`examples/hierarchical_farming_ppo.py`.
 
 ## Deployment
 
