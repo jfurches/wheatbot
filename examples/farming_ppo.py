@@ -1,3 +1,5 @@
+'''Training script for the regular flat FarmingEnv'''
+
 from collections import Counter
 import argparse
 import os
@@ -21,7 +23,7 @@ from gymnasium.wrappers.record_video import RecordVideo
 from gymnasium.wrappers.normalize import NormalizeReward
 
 # pylint: disable=unused-import
-from ..farming import FarmingEnv
+from wheatbot.farming import FarmingEnv
 from .torch_action_mask_recurrent import TorchLSTMActionMaskModel as LSTMModel, TorchAttnActionMaskModel as AttnModel
 
 class ParametricDictFlattenWrapper(gym.ObservationWrapper):

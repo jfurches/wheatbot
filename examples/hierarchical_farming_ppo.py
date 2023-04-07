@@ -1,3 +1,8 @@
+'''Training script to run PPO on the hierarchical environment
+
+It shows how to setup the policies in RLLib.
+'''
+
 from collections import Counter
 import argparse
 import os
@@ -19,7 +24,7 @@ from gymnasium import spaces
 from gymnasium.wrappers.normalize import NormalizeReward, RunningMeanStd
 
 # pylint: disable=unused-import
-from ..farming import FarmingEnv, HierarchicalFarmingEnv
+from wheatbot.farming import FarmingEnv, HierarchicalFarmingEnv
 from .torch_action_mask_recurrent import (
     TorchAttnActionMaskModel as AttnModel,
     TorchLSTMActionMaskModel as LstmModel
