@@ -1,7 +1,7 @@
 os.loadAPI('agent')
 
-addr, port = '127.0.0.1', 80
-endpoint = 'http://' + addr + ':' + tostring(port) + '/endpoint'
+addr, port = '127.0.0.1', 8080
+endpoint = 'http://' + addr + ':' + tostring(port) + '/'
 
 local function getAction(req_data)
     req = http.post(endpoint, textutils.serialiseJSON(req_data))
@@ -21,10 +21,11 @@ local function getAction(req_data)
     end
 end
 
+timesteps = 240
 chestLoc = vector.new(0, 0, 0)
 fieldLoc = vector.new(0, 0, 0)
 
-robot = agent.new(chestLoc, fieldLoc)
+robot = agent.new(240, chestLoc, fieldLoc)
 
 while true do
     print('New episode')

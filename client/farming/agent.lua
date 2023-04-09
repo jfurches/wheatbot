@@ -2,15 +2,18 @@ os.loadAPI('tracker')
 
 local agent
 
-local function new(self, chestLoc, fieldLoc)
+local function new(self, timesteps, chestLoc, fieldLoc)
     setmetatable({}, self)
     self.__index = self
+    self.max_timesteps = timesteps
+    self.timesteps_remaining = self.max_timesteps
     self.tracker = tracker
     self.chestLoc = chestLoc
     self.fieldLoc = fieldLoc
 end
 
 local function reset(self)
+    self.timesteps_remaining = self.max_timesteps
     self.tracker.setLocation()
     return self.getObs(), {}
 end
@@ -94,6 +97,9 @@ local function step(self, action)
     else
         print('Unknown action, ', action)
     end
+
+    self.timesteps_remaining = self.timesteps_remaining - 1
+    done = done or self.timesteps_remaining == 0
 
     return self.getObs(), reward, done, truncated, info
 end
@@ -187,8 +193,8 @@ end
 -- can pass it to rllib
 local function getObs(self)
     obs = {
-        timesteps_remaining = nil,
-        world_time = ((os.time() + 18) % 24) / 24,
+        timesteps_remaining = self.timesteps_remaining / self.max_timesteps,
+        world_time = ((os.time() + 18) % 24) * 1000,
         light_level = nil,
         fuel = turtle.getFuelLevel(),
         wheat = self.getWheat(),
