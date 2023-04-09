@@ -134,6 +134,8 @@ class ServeHierarchicalModel:
             policy_id='low_level_policy'
         )
 
+        self.num_low_steps_remaining -= 1
+
         return action
     
     def _high_level_action(self, obs: dict) -> int:
