@@ -119,7 +119,7 @@ local agent = {
         self.timesteps_remaining = self.timesteps_remaining - 1
         done = done or self.timesteps_remaining == 0
     
-        return self.getObs(), reward, done, truncated, info
+        return self:getObs(), reward, done, truncated, info
     end,
 
     getFacing = function(self)
