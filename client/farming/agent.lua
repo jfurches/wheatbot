@@ -1,5 +1,28 @@
 tracker = require('tracker')
 
+function table.contains(t, el)
+    for k,v in pairs(t) do
+        if el == v then
+            return true
+        end
+    end
+
+    return false
+end
+
+local function oneHot(x, el)
+    vec = {}
+    for k, v in pairs(x) do
+        if el == v then
+            vec[k] = 1
+        else
+            vec[k] = 0
+        end
+    end
+    
+    return vec
+end
+
 local agent = {
     actions = {'no-op', 'move-forward', 'turn-left',
                'turn-right', 'harvest', 'interact-chest'},
@@ -244,29 +267,6 @@ local agent = {
 local ametatable = {
     __index = agent
 }
-
-local function oneHot(x, el)
-    vec = {}
-    for k, v in pairs(x) do
-        if el == v then
-            vec[k] = 1
-        else
-            vec[k] = 0
-        end
-    end
-    
-    return vec
-end
-
-function table.contains(t, el)
-    for k,v in pairs(t) do
-        if el == v then
-            return true
-        end
-    end
-
-    return false
-end
 
 function agent.new(timesteps, chestLoc, fieldLoc)
     return setmetatable({

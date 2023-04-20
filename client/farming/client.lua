@@ -22,8 +22,8 @@ local function getAction(req_data)
 end
 
 timesteps = 240
-chestLoc = vector.new(0, 0, 0)
-fieldLoc = vector.new(0, 0, 0)
+chestLoc = vector.new(-46, 66, -411)
+fieldLoc = vector.new(-37, 66, -412)
 
 robot = agent.new(240, chestLoc, fieldLoc)
 
