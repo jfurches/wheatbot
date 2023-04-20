@@ -86,11 +86,12 @@ class ServeHierarchicalModel:
         return {'action': action}
     
     def _dict_to_vec(self, d):
-        return np.array([d['x'], d['y'], d['z']])
+        # Flip for mc coordinates
+        return np.array([d['x'], d['z'], d['y']])
 
     def _fix_obs(self, observation: dict) -> dict:
-        print('Received obs:')
-        pprint.pprint(observation, width=3)
+        print('Received obs')
+        # pprint.pprint(observation, width=3)
         observation['action_mask'] = np.array(observation['action_mask'])
         obs = observation['observations']
 
@@ -139,6 +140,7 @@ class ServeHierarchicalModel:
     def _get_action(self, obs: dict) -> ActType:
         if self.num_low_steps_remaining == 0:
             self.goal = self._high_level_action(obs)
+            print('New goal:', self.goal)
         
         # Preprocess for low-level agent
         obs = {

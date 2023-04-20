@@ -61,7 +61,7 @@ local agent = {
             if block and block.name == 'wheat' then
                 -- break wheat if mature, else leave it alone
                 if block.age == 7 then
-                    turtle.dig()
+                    turtle.digDown()
                     reward = reward + 0.01
     
                     -- we broke the wheat, so try to replant a seed
@@ -70,10 +70,10 @@ local agent = {
                     if self:getFacing() == nil then
                         for i=1,16,1 do
                             item = turtle.getItemDetail(i)
-                            if item and item.name == 'minecraft:seeds' then
+                            if item and item.name == 'minecraft:wheat_seeds' then
                                 oldSlot = turtle.getSelectedSlot()
                                 turtle.select(i)
-                                turtle.place()
+                                turtle.placeDown()
                                 turtle.select(oldSlot)
                                 break
                             end
@@ -94,7 +94,7 @@ local agent = {
                     if item and item.name == 'minecraft:wheat' then
                         turtle.select(slot)
                         amount = turtle.getItemCount(slot)
-                        ret = turtle.drop()
+                        ret = turtle.dropDown()
                         if ret then
                             info.wheat_collected = info.wheat_collected + amount
                         end
@@ -125,7 +125,7 @@ local agent = {
     getFacing = function(self)
         ret, data = turtle.inspect()
         if not ret then
-            return 'air'
+            ret, data = turtle.inspectDown()
         end
     
         if data.name == 'minecraft:wheat' then
