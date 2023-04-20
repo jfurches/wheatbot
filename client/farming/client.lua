@@ -15,7 +15,7 @@ local function getAction(req_data)
     data = textutils.unserializeJSON(data)
 
     if data then
-        data.action
+        return data.action
     else
         return nil
     end
