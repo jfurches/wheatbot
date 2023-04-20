@@ -41,7 +41,8 @@ while true do
     while not done and not truncated do
         if action == nil then
             print('Null action received')
-            os.reboot()
+            while true do
+            end
         end
 
         obs, reward, done, truncated, info = robot:step(action)
