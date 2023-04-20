@@ -14,7 +14,7 @@ local function setLocation(self) -- get gps using other computers
     self.cal = true
 end
 
-local function manSetLocation(self, number x, number y, number z) -- manually set location
+local function manSetLocation(self, x, y, z) -- manually set location
     self.pos = vector.new(x, y, z)
     self.cal = true
 end

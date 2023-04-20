@@ -162,7 +162,7 @@ class HierarchicalFarmingEnv(MultiAgentEnv):
 
         # Return all info to both agents, since there's no reason to subdivide it
         info = {
-            '__common__': info
+            self.low_level_agent_id: info
         }
 
         return obs, reward, terminated, truncated, info

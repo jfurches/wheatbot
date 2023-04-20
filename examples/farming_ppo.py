@@ -24,7 +24,7 @@ from gymnasium.wrappers.normalize import NormalizeReward
 
 # pylint: disable=unused-import
 from wheatbot.farming import FarmingEnv
-from .torch_action_mask_recurrent import TorchLSTMActionMaskModel as LSTMModel, TorchAttnActionMaskModel as AttnModel
+from torch_action_mask_recurrent import TorchLSTMActionMaskModel as LSTMModel, TorchAttnActionMaskModel as AttnModel
 
 class ParametricDictFlattenWrapper(gym.ObservationWrapper):
     '''Wrapper class that handles environments with an observation space of

@@ -4,14 +4,14 @@ from dataclasses import dataclass
 
 import numpy as np
 
-from ray import serve
-from ray.rllib.algorithms import Algorithm
+from ray import serve, tune
+from ray.rllib.algorithms import Algorithm, AlgorithmConfig
 from starlette.requests import Request
 
 from wheatbot.farming import HierarchicalFarmingEnv
 from wheatbot.farming.farmingenv import ObsType, InfoType, ActType
 from wheatbot.farming.world import Sky
-from .hierarchical_farming_ppo import ParametricDictFlattenWrapper as Flattener
+from hierarchical_farming_ppo import ParametricDictFlattenWrapper as Flattener
 
 class Registry:
     types: Dict[str, Any] = {}
@@ -52,11 +52,11 @@ class ServeHierarchicalModel:
         self.goal = None
         self.state = self.algo.get_policy('low_level_policy').get_initial_state()
 
-        cfg = self.algo.get_config()
-        env = HierarchicalFarmingEnv(cfg['environment'])
+        cfg: AlgorithmConfig = self.algo.get_config()
+        env = HierarchicalFarmingEnv(cfg.env_config)
         self.env = Flattener(env)
 
-        self.max_fuel = cfg['environment']['fuel']
+        self.max_fuel = cfg.env_config['fuel']
     
     async def __call__(self, req: Request) -> Dict[str, ActType]:
         data: dict = await req.json()
@@ -128,7 +128,7 @@ class ServeHierarchicalModel:
         obs = self.env.observation(obs)['low_level_agent']
 
         # Keep track of state since our low level agent is attention based
-        action, self.state, *_ = self.compute_single_action(
+        action, self.state, *_ = self.algo.compute_single_action(
             observation=obs,
             state=self.state,
             policy_id='low_level_policy'
@@ -167,5 +167,16 @@ def get_cli_args() -> argparse.Namespace:
 if __name__ == '__main__':
     args = get_cli_args()
 
+    def env_creator(config):
+        env = HierarchicalFarmingEnv(config)
+        env = Flattener(env)
+
+        return env
+    
+    tune.register_env('FarmingEnv', env_creator)
+
     server = ServeHierarchicalModel.bind(args.checkpoint)
-    serve.run(server, host=args.address, port=args.port)
+    handle = serve.run(server, host=args.address, port=args.port)
+
+    while True:
+        pass

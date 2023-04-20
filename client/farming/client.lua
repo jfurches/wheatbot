@@ -1,7 +1,7 @@
-os.loadAPI('agent')
+agent = require('agent')
 
 addr, port = '127.0.0.1', 8080
-endpoint = 'http://' + addr + ':' + tostring(port) + '/'
+endpoint = 'http://' .. addr .. ':' .. tostring(port) .. '/'
 
 local function getAction(req_data)
     req = http.post(endpoint, textutils.serialiseJSON(req_data))
@@ -29,7 +29,7 @@ robot = agent.new(240, chestLoc, fieldLoc)
 
 while true do
     print('New episode')
-    obs, info = robot.reset()
+    obs, info = robot:reset()
     done, truncated = false, false
     req_data = {
         type = 'reset',
@@ -44,7 +44,7 @@ while true do
             os.reboot()
         end
 
-        obs, reward, done, truncated, info = robot.step(action)
+        obs, reward, done, truncated, info = robot:step(action)
         req_data = {
             type = 'step',
             obs = obs,

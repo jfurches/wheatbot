@@ -21,11 +21,10 @@ from ray.rllib.env import MultiAgentEnv
 
 import gymnasium as gym
 from gymnasium import spaces
-from gymnasium.wrappers.normalize import NormalizeReward, RunningMeanStd
 
 # pylint: disable=unused-import
 from wheatbot.farming import FarmingEnv, HierarchicalFarmingEnv
-from .torch_action_mask_recurrent import (
+from torch_action_mask_recurrent import (
     TorchAttnActionMaskModel as AttnModel,
     TorchLSTMActionMaskModel as LstmModel
 )
@@ -97,15 +96,17 @@ class ParametricDictFlattenWrapper(gym.ObservationWrapper, MultiAgentEnv):
 
 class Metrics(DefaultCallbacks):
     def on_episode_step(self, *, worker, base_env, policies = None, episode: Union[Episode, EpisodeV2], env_index = None, **kwargs):
-        info: Dict[str, Any] = episode._last_infos['__common__']
-        for k, v in info.items():
-            if k.startswith('pos_') or k.endswith('_pbrs') or k.endswith('_dist'):
-                episode.user_data.setdefault(k, []).append(v)
+        for k, info in episode._last_infos.items():
+            if k.startswith('low_level'):
+                for k, v in info.items():
+                    if k.startswith('pos_') or k.endswith('_pbrs') or k.endswith('_dist'):
+                        episode.user_data.setdefault(k, []).append(v)
 
     def on_episode_end(self, *, worker, base_env, policies, episode: EpisodeV2, env_index, **kwargs):
-        info: Dict[str, Any] = episode._last_infos['__common__']
-        episode.custom_metrics['wheat_collected'] = info['wheat_collected']
-        episode.custom_metrics['wheat_harvested'] = info['wheat_harvested']
+        for k, info in episode._last_infos.items():
+            if k.startswith('low_level'):
+                episode.custom_metrics['wheat_collected'] = info['wheat_collected']
+                episode.custom_metrics['wheat_harvested'] = info['wheat_harvested']
 
         for k in episode.user_data.keys():
             if k.startswith('pos_') or k.endswith('_pbrs') or k.endswith('_dist'):
@@ -267,7 +268,9 @@ if __name__ == '__main__':
             local_dir='~/ray_results/HierarchicalFarmingEnv',
             stop=stop,
             checkpoint_config=air.CheckpointConfig(
-                num_to_keep=2
+                num_to_keep=2,
+                checkpoint_frequency=1000,
+                checkpoint_score_attribute='custom_metrics/wheat_collected_mean',
             )
         ),
     )
