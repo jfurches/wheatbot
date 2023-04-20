@@ -27,7 +27,7 @@ local agent = {
     actions = {'no-op', 'move-forward', 'turn-left',
                'turn-right', 'harvest', 'interact-chest'},
     goals = {'goto-field', 'harvest-wheat', 'goto-chest'},
-    blocks = {nil, 'air', 'wheat', 'water', 'dirt', 'grass',
+    blocks = {'nil', 'air', 'wheat', 'water', 'dirt', 'grass',
               'farmland', 'chest', 'composter', 'fence'},
 
     reset = function(self)
@@ -212,7 +212,7 @@ local agent = {
 
         block = self:getFacing()
         if block == nil then
-            obs['facing'] = oneHot(self.blocks, block)
+            obs['facing'] = oneHot(self.blocks, 'air')
             obs['wheat_age'] = 0
         else
             obs['facing'] = oneHot(self.blocks, block.name)
@@ -241,8 +241,8 @@ local agent = {
         end
 
         action_mask = {}
-        for _, allowed in pairs(mask) do
-            action_mask[#action_mask + 1] = allowed
+        for _, action in pairs(self.actions) do
+            action_mask[#action_mask + 1] = mask[action]
         end
 
         return {

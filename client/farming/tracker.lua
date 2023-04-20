@@ -29,12 +29,12 @@ end
 
 local function turnLeft(self) -- turn left
     turtle.turnLeft()
-    self.dir[1], self.dir[3] = self.dir[3], -self.dir[1]
+    self.dir.x, self.dir.z = self.dir.z, -self.dir.x
 end
 
 local function turnRight(self) -- turn right
     turtle.turnRight()
-    self.dir[1], self.dir[3] = -self.dir[3], self.dir[1]
+    self.dir.x, self.dir.z = -self.dir.z, self.dir.x
 end
 
 local function forward(self) -- go forward

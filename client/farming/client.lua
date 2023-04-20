@@ -14,8 +14,8 @@ local function getAction(req_data)
     data = req.readAll()
     data = textutils.unserializeJSON(data)
 
-    if data and data.body then
-        return data.body.action
+    if data then
+        data.action
     else
         return nil
     end

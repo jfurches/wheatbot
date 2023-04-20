@@ -1,11 +1,13 @@
 import argparse
 from typing import Dict, Any
 from dataclasses import dataclass
+import pprint
 
 import numpy as np
 
 from ray import serve, tune
 from ray.rllib.algorithms import Algorithm, AlgorithmConfig
+from ray.rllib.policy.torch_policy import TorchPolicy
 from starlette.requests import Request
 
 from wheatbot.farming import HierarchicalFarmingEnv
@@ -50,13 +52,21 @@ class ServeHierarchicalModel:
         self.num_low_level_steps = num_low_level_steps
         self.num_low_steps_remaining = 0
         self.goal = None
-        self.state = self.algo.get_policy('low_level_policy').get_initial_state()
 
         cfg: AlgorithmConfig = self.algo.get_config()
         env = HierarchicalFarmingEnv(cfg.env_config)
         self.env = Flattener(env)
 
         self.max_fuel = cfg.env_config['fuel']
+
+        cfg = self.algo.get_policy('low_level_policy').config
+        self.num_transformers = cfg['model']['attention_num_transformer_units']
+        self.memory_inference = cfg['model']['attention_memory_inference']
+        self.attention_dim = cfg['model']['attention_dim']
+
+        pprint.pprint(cfg['model'], width=1)
+
+        self.state = None
     
     async def __call__(self, req: Request) -> Dict[str, ActType]:
         data: dict = await req.json()
@@ -74,13 +84,22 @@ class ServeHierarchicalModel:
             action = self.step(data)
         
         return {'action': action}
+    
+    def _dict_to_vec(self, d):
+        return np.array([d['x'], d['y'], d['z']])
 
     def _fix_obs(self, observation: dict) -> dict:
+        print('Received obs:')
+        pprint.pprint(observation, width=1)
+        observation['action_mask'] = np.array(observation['action_mask'])
         obs = observation['observations']
 
         # Convert everything to numpy
         for k, v in obs.items():
-            obs[k] = np.array(v)
+            if k in ['field_displacement', 'chest_displacement', 'direction']:
+                obs[k] = self._dict_to_vec(v)
+            else:
+                obs[k] = np.array(v)
         
         # Get the current light level since we don't have a light sensor. Normalize
         # the resulting value since the policy expects that
@@ -90,7 +109,10 @@ class ServeHierarchicalModel:
         obs['world_time'] = obs['world_time'] / 24000
 
         # Normalize the fuel level
-        obs['fuel'] = min(1, obs['fuel'] / self.max_fuel)
+        if obs['fuel'] == 'unlimited':
+            obs['fuel'] = 1
+        else:
+            obs['fuel'] = min(1, obs['fuel'] / self.max_fuel)
 
         # We also need to normalize the displacements from the chest and field. Since
         # we can't just measure the world size with a turtle, we'll be lazy and try
@@ -109,7 +131,10 @@ class ServeHierarchicalModel:
     
     def _reset_state(self):
         self.num_low_steps_remaining = 0
-        self.state = self.algo.get_policy('low_level_policy').get_initial_state()
+        self.state = [
+            np.zeros([self.memory_inference, self.attention_dim], dtype=np.float32)
+            for _ in range(self.num_transformers)
+        ]
 
     def _get_action(self, obs: dict) -> ActType:
         if self.num_low_steps_remaining == 0:
