@@ -90,7 +90,7 @@ class ServeHierarchicalModel:
 
     def _fix_obs(self, observation: dict) -> dict:
         print('Received obs:')
-        pprint.pprint(observation, width=1)
+        pprint.pprint(observation, width=3)
         observation['action_mask'] = np.array(observation['action_mask'])
         obs = observation['observations']
 
@@ -152,14 +152,24 @@ class ServeHierarchicalModel:
         }
         obs = self.env.observation(obs)['low_level_agent']
 
+        # print('Flattened obs:')
+        # pprint.pprint(obs, width=3)
+
         # Keep track of state since our low level agent is attention based
-        action, self.state, *_ = self.algo.compute_single_action(
+        action, state_out, *_ = self.algo.compute_single_action(
             observation=obs,
             state=self.state,
             policy_id='low_level_policy'
         )
 
+        self.state = [
+            np.concatenate([self.state[i], [state_out[i]]], axis=0)[1:]
+            for i in range(self.num_transformers)
+        ]
+
         self.num_low_steps_remaining -= 1
+
+        print('Predicted action ', action)
 
         return action
     

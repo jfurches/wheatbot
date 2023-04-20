@@ -125,7 +125,7 @@ local agent = {
     getFacing = function(self)
         ret, data = turtle.inspect()
         if not ret then
-            return nil
+            return 'air'
         end
     
         if data.name == 'minecraft:wheat' then
@@ -145,22 +145,22 @@ local agent = {
                 solid = true
             }
         elseif data.tags then
-            if data.tags.contains('forge:grass') then
+            if table.contains(data.tags, 'forge:grass') then
                 return {
                     name = 'grass',
                     solid = true
                 }
-            elseif data.tags.contains('forge:dirt') then
+            elseif table.contains(data.tags, 'forge:dirt') then
                 return {
                     name = 'dirt',
                     solid = true
                 }
-            elseif data.tags.contains('forge:water') then
+            elseif table.contains(data.tags, 'forge:water') then
                 return {
                     name = 'water',
                     solid = false
                 }
-            elseif data.tags.contains('forge:fence') then
+            elseif table.contains(data.tags, 'forge:fence') then
                 return {
                     name = 'fence',
                     solid = true
